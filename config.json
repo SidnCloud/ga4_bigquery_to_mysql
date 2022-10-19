@@ -1,0 +1,9 @@
+{
+    "property_id":"",
+    "project_id":"",
+    "mysql_user":"",
+    "mysql_pw":"",
+    "mysql_host":"",
+    "mysql_db":"",
+    "mysql_table":"ga4_data"
+}
