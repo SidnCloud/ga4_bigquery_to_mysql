@@ -5,6 +5,7 @@ from datetime import datetime,timedelta
 from sqlalchemy import create_engine
 import concurrent.futures
 import pandas as pd
+from pandas.io.json import json_normalize
 import json
 
 print("Loading extraction config from external file")
@@ -18,7 +19,7 @@ client = bigquery.Client(credentials=credentials, project=config_file['project_i
 print("Elaborating sql queries for Bigquery data extraction")
 property_id = config_file['property_id']
 dataset = f"analytics_{property_id}"
-SQLs = [f"SELECT * FROM {dataset}.{str((datetime.now()-timedelta(days=n)).date()).replace('-','')}" for n in [3,2,1]]
+SQLs = [f"SELECT * FROM  `{dataset}.{str((datetime.now()-timedelta(days=n)).date()).replace('-','')}`" for n in [3,2,1]]
 
 def get_bgq_results(sql:str) -> pd.DataFrame:
     print(f"Running query: {sql}")
@@ -30,6 +31,11 @@ with concurrent.futures.ProcessPoolExecutor() as executor:
 
 print("Concatenating results into a single dataFrame")
 df = pd.concat(futures_df)
+
+print('Exploding nested columns')
+nested_cols = ['app_info', 'device', 'user_properties', 'user_ltv', 'traffic_source', 'geo', 'event_params', 'ecommerce', 'items', 'web_info']
+for col in nested_cols:
+    df = json_normalize(df.explode(col)[col])
 
 print("Initializing mysql environment to send ga4 data")
 mysql_engine = create_engine(f"mysql+pymysql://{config_file['mysql_user']}:{config_file['mysql_pw']}@{config_file['mysql_host']}/{config_file['mysql_db']}")
