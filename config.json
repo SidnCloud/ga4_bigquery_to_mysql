@@ -1,9 +1,11 @@
 {
     "property_id":"",
+    "old_credentials_file_name":"",
     "project_id":"",
     "mysql_user":"",
     "mysql_pw":"",
     "mysql_host":"",
     "mysql_db":"",
-    "mysql_table":"ga4_data"
+    "mysql_table_events":"",
+    "mysql_table_users":""
 }
